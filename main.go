@@ -39,6 +39,7 @@ func main() {
 	http.HandleFunc("/api/images/", handleImageAPI)
 	http.HandleFunc("/api/regions/", handleRegionsAPI)
 	http.HandleFunc("/images/", handleImageServe)
+	http.HandleFunc("/thumbs/", handleThumbServe)
 	http.HandleFunc("/", handleWebsite)
 
 	fmt.Println("Server running on :8080")
@@ -153,6 +154,24 @@ func handleImageAPI(w http.ResponseWriter, r *http.Request) {
 		"images":   images,
 		"has_more": count < totalFiles,
 	})
+}
+
+func handleThumbServe(w http.ResponseWriter, r *http.Request) {
+	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/thumbs/"), "/")
+	if len(pathParts) < 2 {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+
+	region, filename := strings.ToLower(pathParts[0]), pathParts[1]
+	if !allowedRegion(region) ||
+		strings.Contains(region, "..") ||
+		strings.Contains(filename, "..") {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	http.ServeFile(w, r, filepath.Join("thumbs", region, filename))
 }
 
 func handleImageServe(w http.ResponseWriter, r *http.Request) {

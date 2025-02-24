@@ -208,7 +208,7 @@
                 data.images.forEach(img => {
                     const imgElement = document.createElement('img');
                     imgElement.className = 'thumbnail';
-                    imgElement.src = `${API_BASE}/images/${region}/${img}`;
+                    imgElement.src = `${API_BASE}/thumbs/${region}/${img}`;
                     imgElement.onclick = () => showImage(`${API_BASE}/images/${region}/${img}`);
                     gallery.appendChild(imgElement);
                 });
