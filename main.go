@@ -59,7 +59,7 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	rows, err := pgConn.Query("SELECT * from region")
+	rows, err := pgConn.Query("SELECT * from public.region")
 	if err != nil {
 		println(err.Error())
 		return
@@ -82,7 +82,7 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func allowedRegion(s string) bool {
-	rows, err := pgConn.Query("SELECT * from region where name=$1", s)
+	rows, err := pgConn.Query("SELECT * from public.region where name=$1", s)
 	if err != nil {
 		println(err.Error())
 		return false
