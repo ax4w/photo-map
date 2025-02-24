@@ -18,7 +18,7 @@ type latlong struct {
 	Lat, Long float32
 }
 
-var allowedRegions = map[string]latlong{
+/*var allowedRegions = map[string]latlong{
 	"mallorca":   {Lat: 39.6, Long: 3.00},
 	"berlin":     {Lat: 52.52, Long: 13.40},
 	"bari":       {Lat: 41.11, Long: 16.87},
@@ -26,7 +26,7 @@ var allowedRegions = map[string]latlong{
 	"montenegro": {Lat: 42.70, Long: 19.37},
 	"venice":     {Lat: 45.44, Long: 12.31},
 	"zadar":      {Lat: 44.11, Long: 15.23},
-}
+}*/
 
 var pgConn *sql.DB
 
@@ -59,7 +59,7 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	rows, err := pgConn.Query("SELECT * from regions")
+	rows, err := pgConn.Query("SELECT * from region")
 	if err != nil {
 		println(err.Error())
 		return
@@ -82,8 +82,12 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func allowedRegion(s string) bool {
-	_, ok := allowedRegions[s]
-	return ok
+	rows, err := pgConn.Query("SELECT * from region where name=$1", s)
+	if err != nil {
+		println(err.Error())
+		return false
+	}
+	return rows.Next()
 }
 
 func handleImageAPI(w http.ResponseWriter, r *http.Request) {
