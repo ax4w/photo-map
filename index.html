@@ -76,8 +76,15 @@
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
+            transition: opacity 0.2s;
         }
-
+        .loading-modal {
+            display: none;
+            position: absolute;
+            color: white;
+            font-size: 1.5em;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
         .close {
             position: absolute;
             top: 25px;
@@ -97,6 +104,7 @@
     <div id="map"></div>
     <div class="modal">
         <span class="close">&times;</span>
+        <div class="loading-modal">Loading...</div>
         <img class="modal-img" src="" alt="Enlarged view">
     </div>
 
@@ -224,11 +232,31 @@
         }
 
         function showImage(src) {
+            const modal = document.querySelector('.modal');
+            const modalImg = document.querySelector('.modal-img');
+            const loading = document.querySelector('.loading-modal');
+
+            modalImg.style.opacity = '0';
+            loading.style.display = 'block';
             modal.style.display = 'flex';
-            modalImg.src = src;
+
+            const newImg = new Image();
+            newImg.src = src;
+            
+            newImg.onload = () => {
+                modalImg.src = src;
+                loading.style.display = 'none';
+                modalImg.style.opacity = '1';
+            };
+            
+            newImg.onerror = () => {
+                loading.style.display = 'none';
+                modal.style.display = 'none';
+                console.error('Failed to load image:', src);
+            };
         }
 
-        
+    
         window.onclick = (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';

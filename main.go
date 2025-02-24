@@ -18,16 +18,6 @@ type latlong struct {
 	Lat, Long float32
 }
 
-/*var allowedRegions = map[string]latlong{
-	"mallorca":   {Lat: 39.6, Long: 3.00},
-	"berlin":     {Lat: 52.52, Long: 13.40},
-	"bari":       {Lat: 41.11, Long: 16.87},
-	"dubrovnik":  {Lat: 42.64, Long: 18.09},
-	"montenegro": {Lat: 42.70, Long: 19.37},
-	"venice":     {Lat: 45.44, Long: 12.31},
-	"zadar":      {Lat: 44.11, Long: 15.23},
-}*/
-
 var pgConn *sql.DB
 
 func main() {
