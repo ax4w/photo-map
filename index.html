@@ -98,6 +98,53 @@
             font-size: 24px; 
             line-height: 30px;
         }
+        .impressum-link {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s;
+        }
+
+        .impressum-link:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .impressum-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            z-index: 1001;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .impressum-modal h2 {
+            margin-top: 0;
+        }
+
+        .impressum-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -270,6 +317,86 @@
                 timeout = setTimeout(() => fn(...args), delay);
             };
         }
+        function showImpressum() {
+            document.getElementById('impressumModal').style.display = 'block';
+        }
+        function showPrivacy() {
+            document.getElementById('privacyModal').style.display = 'block';
+        }
+
+        function hideImpressum() {
+            document.getElementById('impressumModal').style.display = 'none';
+        }
+        function hidePrivacy() {
+            document.getElementById('privacyModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('impressumModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
+    <div class="impressum-link">
+        <span onclick="showImpressum()">Impressum</span> | 
+        <span onclick="showPrivacy()">Datenschutz</span>
+    </div>
+
+    <div class="impressum-modal" id="impressumModal">
+        <span class="impressum-close" onclick="hideImpressum()">&times;</span>
+        <h2>Impressum</h2>
+        
+        <p>
+            <strong>Angaben gemäß § 5 TMG</strong><br>
+            Alexander Wrede<br>
+            Höxsterstraße 120<br>
+            58135 Hagen
+        </p>
+    
+        <p>
+            <strong>Kontakt</strong><br>
+            E-Mail: mail@ax4w.me
+        </p>
+    
+        <p>
+            <strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</strong><br>
+            Alexander Wrede
+        </p>
+    
+        <p>
+            <strong>Haftungsausschluss</strong><br>
+            Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt...
+        </p>
+    </div>
+    <div class="impressum-modal" id="privacyModal">
+        <span class="impressum-close" onclick="hidePrivacy()">&times;</span>
+        <h2>Datenschutzerklärung</h2>
+        
+        <p>
+            <strong>Datenschutz</strong><br>
+            Der Schutz Deiner persönlichen Daten ist uns ein besonderes Anliegen. <br>
+            Wir verarbeiten Deine Daten daher ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, TMG).
+        </p>
+    
+        <p>
+            <strong>Erhebung und Verarbeitung personenbezogener Daten</strong><br>
+            Beim Besuch unserer Website werden automatisch Informationen in Server-Logfiles gespeichert, die Dein Browser an uns übermittelt (z.B. IP-Adresse, Datum, Uhrzeit, etc.). <br>
+            Diese Daten dienen ausschließlich statistischen Zwecken und zur Verbesserung unseres Angebots. <br>
+            Eine Weitergabe an Dritte erfolgt nicht.
+        </p>
+    
+        <p>
+            <strong>Auskunftsrecht</strong><br>
+            Du hast jederzeit das Recht auf Auskunft über die bei uns gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der Datenverarbeitung. <br>
+            Bitte wende Dich hierfür an unsere oben genannte Kontaktadresse.
+        </p>
+    
+        <p>
+            <strong>Kontakt zum Datenschutzbeauftragten</strong><br>
+            Solltest Du Fragen zum Datenschutz haben, kannst Du Dich jederzeit an uns wenden: <br>
+            E-Mail: mail@ax4w.me
+        </p>
+    </div>
 </body>
 </html>
