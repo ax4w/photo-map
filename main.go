@@ -56,6 +56,7 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var regions = make(map[string]latlong)
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			name string
@@ -78,6 +79,7 @@ func allowedRegion(s string) bool {
 		println(err.Error())
 		return false
 	}
+	defer rows.Close()
 	return rows.Next()
 }
 
