@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	_ "github.com/lib/pq"
 )
 
 type latlong struct {
@@ -25,7 +28,14 @@ var allowedRegions = map[string]latlong{
 	"zadar":      {Lat: 44.11, Long: 15.23},
 }
 
+var pgConn *sql.DB
+
 func main() {
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		panic(err.Error())
+	}
+	pgConn = db
 	http.HandleFunc("/api/images/", handleImageAPI)
 	http.HandleFunc("/api/regions/", handleRegionsAPI)
 	http.HandleFunc("/images/", handleImageServe)
@@ -49,7 +59,26 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allowedRegions)
+	rows, err := pgConn.Query("SELECT * from regions")
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	var regions = make(map[string]latlong)
+	for rows.Next() {
+		var (
+			name string
+			lat  float32
+			long float32
+		)
+		err := rows.Scan(&name, &lat, &long)
+		if err != nil {
+			println(err.Error())
+			return
+		}
+		regions[name] = latlong{Lat: lat, Long: long}
+	}
+	json.NewEncoder(w).Encode(regions)
 }
 
 func allowedRegion(s string) bool {
