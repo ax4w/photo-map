@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ax4w - Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .leaflet-popup-content-wrapper {
+            max-width: 100% !important;
+            width: auto !important;
+            border-radius: 12px !important;
+        }
+
+        .leaflet-popup-content {
+            overflow: auto;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border-radius: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: white;
+            font-size: 45px;
+            cursor: pointer;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-img" src="" alt="Enlarged view">
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        const PAGE_SIZE = 30;
+        
+        const map = L.map('map', {
+            minZoom: 2,
+            maxZoom: 5
+        }).setView([30, 0], 2);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const markers = [
+            { latlng: [39.5, 2.65], region: 'mallorca' },
+            // { latlng: [...], region: '...' }
+        ];
+
+        const galleryStates = new Map();
+        const modal = document.querySelector('.modal');
+        const modalImg = document.querySelector('.modal-img');
+        const closeBtn = document.querySelector('.close');
+        markers.forEach(markerData => {
+            const marker = L.marker(markerData.latlng).addTo(map);
+            
+            const region = markerData.region;
+            initGalleryState(region);
+            const state = galleryStates.get(region);
+            const popupContent = createPopupContent(region, state);
+
+            marker.bindPopup(popupContent, {
+                maxWidth: 800,              
+                keepInView: true,            
+                autoPanPadding: L.point(50, 50)
+            });
+
+            marker.on('click', async () => {
+                marker.openPopup();
+                if (state.offset === 0 && state.hasMore) {
+                    await loadImages(region, state, popupContent);
+                }
+            });
+        });
+
+        function initGalleryState(region) {
+            if (!galleryStates.has(region)) {
+                galleryStates.set(region, {
+                    offset: 0,
+                    hasMore: true,
+                    loading: false
+                });
+            }
+        }
+
+        function createPopupContent(region, state) {
+            const container = document.createElement('div');
+            container.innerHTML = `
+                <h3 style="margin: 0 0 15px 10px;">${region.toUpperCase()}</h3>
+                <div class="image-gallery"></div>
+                <div class="loading">Loading...</div>
+            `;
+            
+            const gallery = container.querySelector('.image-gallery');
+
+            gallery.onscroll = debounce(() => {
+                const { scrollTop, scrollHeight, clientHeight } = gallery;
+                if (scrollHeight - (scrollTop + clientHeight) < 200 && !state.loading) {
+                    loadImages(region, state, container);
+                }
+            }, 200);
+            
+            return container;
+        }
+
+        async function loadImages(region, state, container) {
+            if (!state.hasMore || state.loading) return;
+            
+            state.loading = true;
+            container.querySelector('.loading').style.display = 'block';
+            
+            try {
+                const response = await fetch(
+                    `${API_BASE}/api/images/${region}?offset=${state.offset}&limit=${PAGE_SIZE}`
+                );
+                const data = await response.json();
+                
+                const gallery = container.querySelector('.image-gallery');
+                data.images.forEach(img => {
+                    const imgElement = document.createElement('img');
+                    imgElement.className = 'thumbnail';
+                    imgElement.src = `${API_BASE}/images/${region}/${img}`;
+                    imgElement.onclick = () => showImage(`${API_BASE}/images/${region}/${img}`);
+                    gallery.appendChild(imgElement);
+                });
+                
+                state.offset += data.images.length;
+                state.hasMore = data.has_more;
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                state.loading = false;
+                container.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        function showImage(src) {
+            modal.style.display = 'flex';
+            modalImg.src = src;
+        }
+
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function debounce(fn, delay) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+    </script>
+</body>
+</html>
