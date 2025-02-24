@@ -11,13 +11,23 @@ import (
 	"strings"
 )
 
-var allowedRegions = map[string]bool{
-	"mallorca": true,
-	"canaries": true,
+type latlong struct {
+	Lat, Long float32
+}
+
+var allowedRegions = map[string]latlong{
+	"mallorca":   {Lat: 39.6, Long: 3.00},
+	"berlin":     {Lat: 52.52, Long: 13.40},
+	"bari":       {Lat: 41.11, Long: 16.87},
+	"dubrovnik":  {Lat: 42.64, Long: 18.09},
+	"montenegro": {Lat: 42.70, Long: 19.37},
+	"venice":     {Lat: 45.44, Long: 12.31},
+	"zadar":      {Lat: 44.11, Long: 15.23},
 }
 
 func main() {
 	http.HandleFunc("/api/images/", handleImageAPI)
+	http.HandleFunc("/api/regions/", handleRegionsAPI)
 	http.HandleFunc("/images/", handleImageServe)
 	http.HandleFunc("/", handleWebsite)
 
@@ -27,6 +37,24 @@ func main() {
 
 func handleWebsite(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./index.html")
+}
+
+func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(allowedRegions)
+}
+
+func allowedRegion(s string) bool {
+	_, ok := allowedRegions[s]
+	return ok
 }
 
 func handleImageAPI(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +74,7 @@ func handleImageAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	region := strings.ToLower(pathParts[0])
-	if !allowedRegions[region] || strings.Contains(region, "..") {
+	if !allowedRegion(region) || strings.Contains(region, "..") {
 		http.Error(w, "Invalid region", http.StatusForbidden)
 		return
 	}
@@ -102,7 +130,7 @@ func handleImageServe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	region, filename := strings.ToLower(pathParts[0]), pathParts[1]
-	if !allowedRegions[region] ||
+	if !allowedRegion(region) ||
 		strings.Contains(region, "..") ||
 		strings.Contains(filename, "..") {
 		http.Error(w, "Forbidden", http.StatusForbidden)

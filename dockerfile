@@ -19,7 +19,6 @@
     COPY --from=build /app/server /app/
     
     COPY --from=build /app/index.html /app/
-    COPY --from=build /app/images /app/images
     
     EXPOSE 8080
     

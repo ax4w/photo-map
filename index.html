@@ -104,6 +104,11 @@
     <script>
         const API_BASE = 'http://localhost:8080';
         const PAGE_SIZE = 30;
+
+        const galleryStates = new Map();
+        const modal = document.querySelector('.modal');
+        const modalImg = document.querySelector('.modal-img');
+        const closeBtn = document.querySelector('.close');
         
         const map = L.map('map', {
             minZoom: 2,
@@ -121,38 +126,32 @@
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://carto.com/">Carto</a>'
         }).addTo(map);
+        
+        locations().then(data => {
+            for (let key in data) {
+                const marker = L.marker([data[key].Lat, data[key].Long], { icon: pinIcon }).addTo(map);
+                const region = key;
+                initGalleryState(region);
+                const state = galleryStates.get(region);
+                const popupContent = createPopupContent(region, state);
 
-        const markers = [
-            { latlng: [39.6, 3.00], region: 'Mallorca' },
-            { latlng: [45.44, 12.31], region: 'Venice' },
-            // { latlng: [...], region: '...' }
-        ];
+                marker.bindPopup(popupContent, {
+                    maxWidth: 800,        
+                    keepInView: true,            
+                    autoPanPadding: L.point(50, 50)
+                });
 
-        const galleryStates = new Map();
-        const modal = document.querySelector('.modal');
-        const modalImg = document.querySelector('.modal-img');
-        const closeBtn = document.querySelector('.close');
-        markers.forEach(markerData => {
-            const marker = L.marker(markerData.latlng, { icon: pinIcon }).addTo(map);
-            
-            const region = markerData.region;
-            initGalleryState(region);
-            const state = galleryStates.get(region);
-            const popupContent = createPopupContent(region, state);
-
-            marker.bindPopup(popupContent, {
-                maxWidth: 800,        
-                keepInView: true,            
-                autoPanPadding: L.point(50, 50)
-            });
-
-            marker.on('click', async () => {
-                marker.openPopup();
-                if (state.offset === 0 && state.hasMore) {
-                    await loadImages(region, state, popupContent);
-                }
-            });
-        });
+                marker.on('click', async () => {
+                    marker.openPopup();
+                    if (state.offset === 0 && state.hasMore) {
+                        await loadImages(region, state, popupContent);
+                    }
+                });
+            }
+        })
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
 
         function initGalleryState(region) {
             if (!galleryStates.has(region)) {
@@ -182,6 +181,14 @@
             }, 200);
             
             return container;
+        }
+
+        async function locations() {
+            const response = await fetch(
+                `${API_BASE}/api/regions/`
+            );
+            const data = await response.json();
+            return data
         }
 
         async function loadImages(region, state, container) {
@@ -220,9 +227,7 @@
             modalImg.src = src;
         }
 
-        closeBtn.onclick = () => {
-            modal.style.display = 'none';
-        };
+        
         window.onclick = (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
