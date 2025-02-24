@@ -45,7 +45,7 @@ func handleImageAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	region := pathParts[0]
+	region := strings.ToLower(pathParts[0])
 	if !allowedRegions[region] || strings.Contains(region, "..") {
 		http.Error(w, "Invalid region", http.StatusForbidden)
 		return
@@ -101,7 +101,7 @@ func handleImageServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	region, filename := pathParts[0], pathParts[1]
+	region, filename := strings.ToLower(pathParts[0]), pathParts[1]
 	if !allowedRegions[region] ||
 		strings.Contains(region, "..") ||
 		strings.Contains(filename, "..") {
