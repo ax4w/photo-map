@@ -171,7 +171,6 @@ func handleThumbServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	println("thumbnail from:", filepath.Join("thumbs", region, filename))
 	http.ServeFile(w, r, filepath.Join("thumbs", region, filename))
 }
 
