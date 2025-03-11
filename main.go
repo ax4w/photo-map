@@ -15,7 +15,7 @@ import (
 )
 
 type latlong struct {
-	Lat, Long float32
+	Lat, Long float64
 }
 
 var (
