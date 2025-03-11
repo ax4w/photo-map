@@ -58,14 +58,14 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if tx := pgConn.Find(&regions); tx.Error != nil {
-		println(tx.Error.Error())
-		w.WriteHeader(http.StatusOK)
+		println("error", tx.Error.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	for _, v := range regions {
 		regionsM[v.Name] = latlong{Lat: v.Lat, Long: v.Long}
 	}
-	json.NewEncoder(w).Encode(regions)
+	json.NewEncoder(w).Encode(regionsM)
 }
 
 func allowedRegion(s string) bool {
