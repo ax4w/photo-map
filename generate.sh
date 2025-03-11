@@ -1,9 +1,10 @@
 #!/bin/bash
 # This script iterates over the "images" directory and creates thumbnails in the "thumbs" directory.
 # It preserves the directory structure and uses ImageMagick's convert command to resize images.
+# Adjust THUMB_SIZE if you want a different target size (e.g., 300x300 for square thumbnails).
 
-SRC_DIR="images"
-DST_DIR="thumbs"
+SRC_DIR="map-data/images"
+DST_DIR="map-data/thumbs"
 THUMB_SIZE="300x300"  # Adjust size as needed
 
 # Create the destination directory if it doesn't exist
@@ -18,6 +19,6 @@ find "$SRC_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -
     # Create the destination directory if it doesn't exist
     mkdir -p "$(dirname "$dst_file")"
     # Resize the image and save it to the destination
-    convert "$file" -resize "$THUMB_SIZE" "$dst_file"
+    magick "$file" -resize "$THUMB_SIZE" "$dst_file"
     echo "Thumbnail created: $dst_file"
 done
