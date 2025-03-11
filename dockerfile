@@ -13,6 +13,9 @@
     FROM alpine:latest
 
     RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+    RUN apk add --no-cache file
+    RUN apk --update add imagemagick
     
     WORKDIR /app
     
