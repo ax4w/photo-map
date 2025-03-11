@@ -76,13 +76,15 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 
 func allowedRegion(s string) bool {
 	var (
-		region = Region{Name: s}
-		tx     = pgConn.First(&region)
+		region Region
+		tx     = pgConn.Where("name = ?", s).First(&region)
 	)
 	if tx.Error != nil {
 		println(tx.Error.Error())
+		return false
 	}
-	return region.Hash != "" && tx.Error != nil
+	println("got hash", region.Hash, "for", s)
+	return region.Hash != ""
 }
 
 func handleImageAPI(w http.ResponseWriter, r *http.Request) {

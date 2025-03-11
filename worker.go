@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -39,6 +40,7 @@ func insertNewFolder(name string) {
 func fsWorkerLogic() {
 	var (
 		needsRegeneration bool
+		scriptPath        = filepath.Join(basePath, "generate.sh")
 	)
 	if _, err := os.Stat(imagesBasePath); errors.Is(err, os.ErrNotExist) {
 		os.MkdirAll(imagesBasePath, os.ModePerm)
@@ -48,10 +50,10 @@ func fsWorkerLogic() {
 		os.MkdirAll(thumbnailsBasePath, os.ModePerm)
 		println("Creating Thumbs Folder")
 	}
-	if _, err := os.Stat("generate.sh"); errors.Is(err, os.ErrNotExist) {
-		os.WriteFile("generate.sh", generateThumbsScript, os.ModePerm)
+	if _, err := os.Stat(scriptPath); errors.Is(err, os.ErrNotExist) {
+		os.WriteFile(scriptPath, generateThumbsScript, os.ModePerm)
 		println("Creating generate.sh script")
-		err := exec.Command("chmod", "+x", "generate.sh").Run()
+		err := exec.Command("chmod", "+x", scriptPath).Run()
 		if err != nil {
 			println("error chmod +x file", err.Error())
 		}
@@ -83,7 +85,7 @@ func fsWorkerLogic() {
 		}
 	}
 	if needsRegeneration {
-		err := exec.Command("/bin/sh", "generate.sh").Run()
+		err := exec.Command("/bin/sh", scriptPath).Run()
 		if err != nil {
 			println("error running generate", err.Error())
 		}
