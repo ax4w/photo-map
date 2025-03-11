@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,20 +10,24 @@ import (
 	"strconv"
 	"strings"
 
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type latlong struct {
 	Lat, Long float32
 }
 
-var pgConn *sql.DB
+var pgConn *gorm.DB
 
 func main() {
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("host"), os.Getenv("user"), os.Getenv("password"), os.Getenv("dbname"), os.Getenv("port"))
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err.Error())
 	}
+	db.AutoMigrate(&Region{})
 	pgConn = db
 	http.HandleFunc("/api/images/", handleImageAPI)
 	http.HandleFunc("/api/regions/", handleRegionsAPI)
@@ -41,6 +44,10 @@ func handleWebsite(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
+	var (
+		regionsM = make(map[string]latlong)
+		regions  []Region
+	)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method == http.MethodOptions {
@@ -50,37 +57,26 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	rows, err := pgConn.Query("SELECT * from public.region")
-	if err != nil {
-		println(err.Error())
+	if tx := pgConn.Find(&regions); tx.Error != nil {
+		println(tx.Error.Error())
+		w.WriteHeader(http.StatusOK)
 		return
 	}
-	var regions = make(map[string]latlong)
-	defer rows.Close()
-	for rows.Next() {
-		var (
-			name string
-			lat  float32
-			long float32
-		)
-		err := rows.Scan(&name, &lat, &long)
-		if err != nil {
-			println(err.Error())
-			return
-		}
-		regions[name] = latlong{Lat: lat, Long: long}
+	for _, v := range regions {
+		regionsM[v.Name] = latlong{Lat: v.Lat, Long: v.Long}
 	}
 	json.NewEncoder(w).Encode(regions)
 }
 
 func allowedRegion(s string) bool {
-	rows, err := pgConn.Query("SELECT * from public.region where name=$1", s)
-	if err != nil {
-		println(err.Error())
-		return false
+	var (
+		region = Region{Name: s}
+		tx     = pgConn.First(&region)
+	)
+	if tx.Error != nil {
+		println(tx.Error.Error())
 	}
-	defer rows.Close()
-	return rows.Next()
+	return tx.RowsAffected > 0 && tx.Error != nil
 }
 
 func handleImageAPI(w http.ResponseWriter, r *http.Request) {
