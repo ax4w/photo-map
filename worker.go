@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -45,10 +46,14 @@ func insertNewFolder(name string) {
 	if len(jsonData) == 0 {
 		return
 	}
+	var (
+		lat, _  = strconv.ParseFloat(jsonData[0]["lat"].(string), 64)
+		long, _ = strconv.ParseFloat(jsonData[0]["lon"].(string), 64)
+	)
 	pgConn.Create(&Region{
 		Name: name,
-		Lat:  jsonData[0]["lat"].(float64),
-		Long: jsonData[0]["lon"].(float64),
+		Lat:  lat,
+		Long: long,
 	})
 }
 
