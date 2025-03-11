@@ -27,7 +27,7 @@ func fsWorker() {
 func insertNewFolder(name string) {
 	var (
 		resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=1", name))
-		jsonData  map[string]any
+		jsonData  []map[string]any
 	)
 	if err != nil {
 		println("error in get", err.Error())
@@ -42,10 +42,13 @@ func insertNewFolder(name string) {
 		println(err.Error())
 		return
 	}
+	if len(jsonData) == 0 {
+		return
+	}
 	pgConn.Create(&Region{
 		Name: name,
-		Lat:  jsonData["lat"].(float64),
-		Long: jsonData["lon"].(float64),
+		Lat:  jsonData[0]["lat"].(float64),
+		Long: jsonData[0]["lon"].(float64),
 	})
 }
 
