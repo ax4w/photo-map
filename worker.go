@@ -24,7 +24,7 @@ func fsWorker() {
 }
 
 func insertNewFolder(name string) {
-	var resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?%s", name))
+	var resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s", name))
 	if err != nil {
 		println("error in get", err.Error())
 		return
