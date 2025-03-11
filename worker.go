@@ -25,7 +25,7 @@ func fsWorker() {
 	}
 }
 
-func insertNewFolder(name string) {
+func insertNewRegion(name string) {
 	var (
 		resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=1", name))
 		jsonData  []map[string]any
@@ -93,8 +93,7 @@ func fsWorkerLogic() {
 		)
 		if region.Hash == "" {
 			println("found nothing for", v.Name())
-			insertNewFolder(v.Name())
-			continue
+			insertNewRegion(v.Name())
 		}
 		if hash != region.Hash {
 			needsRegeneration = true
