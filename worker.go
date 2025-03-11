@@ -25,12 +25,12 @@ func fsWorker() {
 func insertNewFolder(name string) {
 	var resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?%s", name))
 	if err != nil {
-		println(err.Error())
+		println("error in get", err.Error())
 		return
 	}
 	bodyInBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		println(err.Error())
+		println("error reading response", err.Error())
 		return
 	}
 	println(string(bodyInBytes))
@@ -53,12 +53,12 @@ func fsWorkerLogic() {
 		println("Creating generate.sh script")
 		err := exec.Command("chmod", "+x", "generate.sh").Run()
 		if err != nil {
-			println(err.Error())
+			println("error chmod +x file", err.Error())
 		}
 	}
 	entries, err := os.ReadDir(imagesBasePath)
 	if err != nil {
-		println(err.Error())
+		println("error reading dir", err.Error())
 		return
 	}
 	for _, v := range entries {
@@ -69,7 +69,8 @@ func fsWorkerLogic() {
 			region  = Region{Name: v.Name()}
 			tx      = pgConn.First(&region)
 		)
-		if tx.RowsAffected == 0 {
+		if tx.RowsAffected == 0 || region.Hash == "" {
+			println("found nothing for", v.Name())
 			insertNewFolder(v.Name())
 			continue
 		}
@@ -77,14 +78,14 @@ func fsWorkerLogic() {
 			needsRegeneration = true
 			tx = pgConn.Model(&Region{}).Where("name = ?", v.Name()).Update("hash", hash)
 			if tx.Error != nil {
-				println(err.Error())
+				println(tx.Error.Error())
 			}
 		}
 	}
 	if needsRegeneration {
 		err := exec.Command("/bin/sh", "generate.sh").Run()
 		if err != nil {
-			println(err.Error())
+			println("error running generate", err.Error())
 		}
 	}
 }

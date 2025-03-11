@@ -82,7 +82,7 @@ func allowedRegion(s string) bool {
 	if tx.Error != nil {
 		println(tx.Error.Error())
 	}
-	return tx.RowsAffected > 0 && tx.Error != nil
+	return region.Hash != "" && tx.Error != nil
 }
 
 func handleImageAPI(w http.ResponseWriter, r *http.Request) {
