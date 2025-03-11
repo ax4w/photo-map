@@ -19,7 +19,7 @@ type latlong struct {
 }
 
 var (
-	basePath           = "map-data"
+	basePath           = filepath.Join("/", "map-data")
 	imagesBasePath     = filepath.Join(basePath, "images")
 	thumbnailsBasePath = filepath.Join(basePath, "thumbs")
 	pgConn             *gorm.DB
