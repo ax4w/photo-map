@@ -16,6 +16,7 @@
 
     RUN apk add --no-cache file
     RUN apk --update add imagemagick
+    RUN apk add --no-cache imagemagick imagemagick-libs libjpeg-turbo
     
     WORKDIR /app
     
