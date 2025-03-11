@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -24,7 +25,10 @@ func fsWorker() {
 }
 
 func insertNewFolder(name string) {
-	var resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s", name))
+	var (
+		resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=1", name))
+		jsonData  map[string]any
+	)
 	if err != nil {
 		println("error in get", err.Error())
 		return
@@ -34,7 +38,15 @@ func insertNewFolder(name string) {
 		println("error reading response", err.Error())
 		return
 	}
-	println(string(bodyInBytes))
+	if err := json.Unmarshal(bodyInBytes, &jsonData); err != nil {
+		println(err.Error())
+		return
+	}
+	pgConn.Create(&Region{
+		Name: name,
+		Lat:  jsonData["lat"].(float64),
+		Long: jsonData["lon"].(float64),
+	})
 }
 
 func fsWorkerLogic() {

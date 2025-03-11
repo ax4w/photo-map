@@ -2,7 +2,7 @@ package main
 
 type Region struct {
 	Name string
-	Lat  float32
-	Long float32
+	Lat  float64
+	Long float64
 	Hash string
 }
