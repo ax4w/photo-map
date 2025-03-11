@@ -21,7 +21,7 @@ var generateThumbsScript []byte
 func fsWorker() {
 	for {
 		fsWorkerLogic()
-		time.Sleep(1 * time.Minute)
+		time.Sleep(2 * time.Minute)
 	}
 }
 
