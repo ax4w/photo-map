@@ -68,10 +68,10 @@ func fsWorkerLogic() {
 			info, _ = v.Info()
 			str     = fmt.Sprintf("%d%d", info.ModTime().UnixMilli(), info.Size())
 			hash    = fmt.Sprintf("%x", sha256.Sum256([]byte(str)))
-			region  = Region{Name: v.Name()}
-			tx      = pgConn.First(&region)
+			region  = Region{}
+			tx      = pgConn.Where("name = ?", v.Name()).First(&region)
 		)
-		if tx.RowsAffected == 0 || region.Hash == "" {
+		if region.Hash == "" {
 			println("found nothing for", v.Name())
 			insertNewFolder(v.Name())
 			continue

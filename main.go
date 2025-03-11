@@ -83,7 +83,6 @@ func allowedRegion(s string) bool {
 		println(tx.Error.Error())
 		return false
 	}
-	println("got hash", region.Hash, "for", s)
 	return region.Hash != ""
 }
 
