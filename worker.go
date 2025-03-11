@@ -63,12 +63,18 @@ func fsWorkerLogic() {
 		scriptPath        = filepath.Join(basePath, "generate.sh")
 	)
 	if _, err := os.Stat(imagesBasePath); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(imagesBasePath, os.ModePerm)
 		println("Creating Image Folder")
+		err := os.MkdirAll(imagesBasePath, os.ModePerm)
+		if err != nil {
+			println(err.Error())
+		}
 	}
 	if _, err := os.Stat(thumbnailsBasePath); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(thumbnailsBasePath, os.ModePerm)
 		println("Creating Thumbs Folder")
+		err := os.MkdirAll(thumbnailsBasePath, os.ModePerm)
+		if err != nil {
+			println(err.Error())
+		}
 	}
 	if _, err := os.Stat(scriptPath); errors.Is(err, os.ErrNotExist) {
 		os.WriteFile(scriptPath, generateThumbsScript, os.ModePerm)
