@@ -64,14 +64,14 @@ func fsWorkerLogic() {
 	)
 	if _, err := os.Stat(imagesBasePath); errors.Is(err, os.ErrNotExist) {
 		println("Creating Image Folder")
-		err := os.MkdirAll(imagesBasePath, 0755)
+		err := os.Mkdir(imagesBasePath, 0755)
 		if err != nil {
 			println(err.Error())
 		}
 	}
 	if _, err := os.Stat(thumbnailsBasePath); errors.Is(err, os.ErrNotExist) {
 		println("Creating Thumbs Folder")
-		err := os.MkdirAll(thumbnailsBasePath, 0755)
+		err := os.Mkdir(thumbnailsBasePath, 0755)
 		if err != nil {
 			println(err.Error())
 		}
