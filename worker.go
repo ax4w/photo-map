@@ -109,7 +109,7 @@ func fsWorkerLogic() {
 		if err != nil {
 			println("error running generate", err.Error())
 		}
-		println(out)
+		println(string(out))
 		println("finished rengerating thumbnails")
 	}
 }
