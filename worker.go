@@ -104,6 +104,7 @@ func fsWorkerLogic() {
 		}
 	}
 	if needsRegeneration {
+		println("regenerating thumbnails")
 		err := exec.Command("/bin/sh", scriptPath).Run()
 		if err != nil {
 			println("error running generate", err.Error())
