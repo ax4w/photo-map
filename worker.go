@@ -64,20 +64,20 @@ func fsWorkerLogic() {
 	)
 	if _, err := os.Stat(imagesBasePath); errors.Is(err, os.ErrNotExist) {
 		println("Creating Image Folder")
-		err := os.MkdirAll(imagesBasePath, os.ModePerm)
+		err := os.MkdirAll(imagesBasePath, 0755)
 		if err != nil {
 			println(err.Error())
 		}
 	}
 	if _, err := os.Stat(thumbnailsBasePath); errors.Is(err, os.ErrNotExist) {
 		println("Creating Thumbs Folder")
-		err := os.MkdirAll(thumbnailsBasePath, os.ModePerm)
+		err := os.MkdirAll(thumbnailsBasePath, 0755)
 		if err != nil {
 			println(err.Error())
 		}
 	}
 	if _, err := os.Stat(scriptPath); errors.Is(err, os.ErrNotExist) {
-		os.WriteFile(scriptPath, generateThumbsScript, os.ModePerm)
+		os.WriteFile(scriptPath, generateThumbsScript, 0755)
 		println("Creating generate.sh script")
 		err := exec.Command("chmod", "+x", scriptPath).Run()
 		if err != nil {
