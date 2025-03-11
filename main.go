@@ -184,7 +184,7 @@ func handleImageServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.ServeFile(w, r, filepath.Join("images", region, filename))
+	http.ServeFile(w, r, filepath.Join(imagesBasePath, region, filename))
 }
 
 func isImage(filename string) bool {
