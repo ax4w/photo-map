@@ -18,7 +18,12 @@ type latlong struct {
 	Lat, Long float32
 }
 
-var pgConn *gorm.DB
+var (
+	basePath           = "map-data"
+	imagesBasePath     = filepath.Join(basePath, "images")
+	thumbnailsBasePath = filepath.Join(basePath, "thumbs")
+	pgConn             *gorm.DB
+)
 
 func main() {
 	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
@@ -108,7 +113,7 @@ func handleImageAPI(w http.ResponseWriter, r *http.Request) {
 		limit = 30
 	}
 
-	imagePath := filepath.Join("images", region)
+	imagePath := filepath.Join(imagesBasePath, region)
 	files, err := os.ReadDir(imagePath)
 	if err != nil {
 		http.Error(w, "Region not found", http.StatusNotFound)
@@ -160,7 +165,7 @@ func handleThumbServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.ServeFile(w, r, filepath.Join("thumbs", region, filename))
+	http.ServeFile(w, r, filepath.Join(thumbnailsBasePath, region, filename))
 }
 
 func handleImageServe(w http.ResponseWriter, r *http.Request) {

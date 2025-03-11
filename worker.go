@@ -5,14 +5,11 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"time"
-)
-
-const (
-	imagesBasePath     = "images"
-	thumbnailsBasePath = "thumbs"
 )
 
 //go:embed generate.sh
@@ -23,6 +20,20 @@ func fsWorker() {
 		fsWorkerLogic()
 		time.Sleep(10 * time.Minute)
 	}
+}
+
+func insertNewFolder(name string) {
+	var resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?%s", name))
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	bodyInBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	println(string(bodyInBytes))
 }
 
 func fsWorkerLogic() {
@@ -59,7 +70,7 @@ func fsWorkerLogic() {
 			tx      = pgConn.First(&region)
 		)
 		if tx.RowsAffected == 0 {
-			println("Found nothing in DB for", v.Name())
+			insertNewFolder(v.Name())
 			continue
 		}
 		if hash != region.Hash {
