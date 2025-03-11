@@ -35,6 +35,7 @@ func main() {
 	http.HandleFunc("/thumbs/", handleThumbServe)
 	http.HandleFunc("/", handleWebsite)
 
+	go fsWorker()
 	fmt.Println("Server running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
