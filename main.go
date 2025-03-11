@@ -21,8 +21,8 @@ type latlong struct {
 var pgConn *gorm.DB
 
 func main() {
-	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("host"), os.Getenv("user"), os.Getenv("password"), os.Getenv("dbname"), os.Getenv("port"))
+	var dsn = fmt.Sprintf("host=%s user=%s password=%sport=%s sslmode=disable",
+		os.Getenv("host"), os.Getenv("user"), os.Getenv("password"), os.Getenv("port"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err.Error())
