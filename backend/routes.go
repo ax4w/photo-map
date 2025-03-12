@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"encoding/json"
@@ -9,7 +9,22 @@ import (
 	"strings"
 )
 
-func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
+func serveFile(w http.ResponseWriter, r *http.Request, folder string, pathParts []string) {
+	if len(pathParts) < 2 {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	region, filename := strings.ToLower(pathParts[0]), pathParts[1]
+	if !allowedRegion(region) ||
+		strings.Contains(region, "..") ||
+		strings.Contains(filename, "..") {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join(folder, region, filename))
+}
+
+func Regions(w http.ResponseWriter, r *http.Request) {
 	var (
 		regionsM = make(map[string]latlong)
 		regions  []Region
@@ -34,7 +49,7 @@ func handleRegionsAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(regionsM)
 }
 
-func handleImageAPI(w http.ResponseWriter, r *http.Request) {
+func Images(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method == http.MethodOptions {
@@ -99,12 +114,16 @@ func handleImageAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func handleThumbServe(w http.ResponseWriter, r *http.Request) {
+func Thumbnail(w http.ResponseWriter, r *http.Request) {
 	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/thumbs/"), "/")
 	serveFile(w, r, thumbnailsBasePath, pathParts)
 }
 
-func handleImageServe(w http.ResponseWriter, r *http.Request) {
+func Image(w http.ResponseWriter, r *http.Request) {
 	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/images/"), "/")
 	serveFile(w, r, imagesBasePath, pathParts)
+}
+
+func Website(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./frontend/index.html")
 }

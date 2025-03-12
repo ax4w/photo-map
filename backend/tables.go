@@ -1,4 +1,4 @@
-package main
+package backend
 
 type Region struct {
 	Name string
