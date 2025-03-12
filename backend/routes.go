@@ -5,11 +5,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"pics/frontend"
 	"strconv"
 	"strings"
-
-	"github.com/a-h/templ"
 )
 
 func Cors(next http.HandlerFunc) http.HandlerFunc {
@@ -123,9 +120,4 @@ func Thumbnail(w http.ResponseWriter, r *http.Request) {
 func Image(w http.ResponseWriter, r *http.Request) {
 	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/images/"), "/")
 	serveFile(w, r, imagesBasePath, pathParts)
-}
-
-func Website(w http.ResponseWriter, r *http.Request) {
-	var index = frontend.Index(os.Getenv("title"))
-	templ.Handler(index)
 }
