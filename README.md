@@ -20,7 +20,7 @@ You will need to set the following environment variables, which are used to conn
 - `port` : port of the database server
 - `user` : username to log into the database server
 - `password` : password to log into the database server
-
+- `title` : the title of the website
   
 ## Adding Locations
 Folders and scripts are automatically created when starting the container.
@@ -47,3 +47,6 @@ The `lat` and `long` are fetched from [nominatim](https://nominatim.openstreetma
 
 The gallery might look broken, because each time images change the thumbnails are being rebuild. If you have many images stored the rebuilding might take longer and the 
 thumbnails might not be generated yet. So just wait a bit :-) (You can see in the logs, if generation has been started / is finished)
+
+## Perfomance
+Perfomance should be okay. When opening a marker only the generated thumbnails are displayed inside the gallery. Full-Resolution images are only fetched when opening an image. Thumbnails are fetched with a page size of 30 to avoid perfomance loss when opening the gallery

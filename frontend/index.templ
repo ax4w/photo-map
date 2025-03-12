@@ -1,0 +1,345 @@
+package frontend
+
+templ Index(title string) {
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{ title }</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+        <style>
+            #map {
+                height: 100vh;
+                width: 100%;
+                background-color: #262626;
+            }
+
+            body {
+                background-color: #262626;
+            }
+
+            .image-gallery {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(180px, 1fr));
+                gap: 5px;
+                max-height: 30vh;
+                overflow-y: auto;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            .thumbnail {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: transform 0.2s;
+            }
+
+            .thumbnail:hover {
+                transform: scale(1.05);
+            }
+
+            .leaflet-popup-content-wrapper {
+                max-width: 100% !important;
+                width: auto !important;
+                border-radius: 12px !important;
+            }
+
+            .leaflet-popup-content {
+                overflow: auto;
+            }
+
+            .loading {
+                display: none;
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 8px 20px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                border-radius: 20px;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .modal-img {
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                transition: opacity 0.2s;
+            }
+            .loading-modal {
+                display: none;
+                position: absolute;
+                color: white;
+                font-size: 1.5em;
+                text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            }
+            .close {
+                position: absolute;
+                top: 25px;
+                right: 35px;
+                color: white;
+                font-size: 45px;
+                cursor: pointer;
+                text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            }
+            .emoji-pin {
+                font-size: 24px; 
+                line-height: 30px;
+            }
+            .impressum-link {
+                position: fixed;
+                bottom: 15px;
+                right: 15px;
+                z-index: 1000;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 0.9em;
+                backdrop-filter: blur(2px);
+                transition: all 0.3s;
+            }
+
+            .impressum-link:hover {
+                background: rgba(0, 0, 0, 0.9);
+            }
+
+            .impressum-modal {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 25px;
+                border-radius: 10px;
+                max-width: 600px;
+                width: 90%;
+                z-index: 1001;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .impressum-modal h2 {
+                margin-top: 0;
+            }
+
+            .impressum-close {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 24px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <div class="modal">
+            <span class="close">&times;</span>
+            <div class="loading-modal">Loading...</div>
+            <img class="modal-img" src="" alt="Enlarged view">
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+        <script>
+            const galleryStates = new Map();
+            const modal = document.querySelector('.modal');
+            const modalImg = document.querySelector('.modal-img');
+            const closeBtn = document.querySelector('.close');
+            
+            const map = L.map('map', {
+                minZoom: 2,
+                maxZoom: 6
+            }).setView([30, 0], 2);
+
+            const pinIcon = L.divIcon({
+                className: 'emoji-pin',
+                html: '📍', 
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            });
+
+            //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">Carto</a>',
+                noWrap: true
+            }).addTo(map);
+            
+            locations().then(data => {
+                for (let key in data) {
+                    const marker = L.marker([data[key].Lat, data[key].Long], { icon: pinIcon }).addTo(map);
+                    const region = key;
+                    initGalleryState(region);
+                    const state = galleryStates.get(region);
+                    const popupContent = createPopupContent(region, state);
+
+                    marker.bindPopup(popupContent, {
+                        maxWidth: 800,        
+                        keepInView: true,            
+                        autoPanPadding: L.point(50, 50)
+                    });
+
+                    marker.on('click', async () => {
+                        marker.openPopup();
+                        if (state.offset === 0 && state.hasMore) {
+                            await loadImages(region, state, popupContent);
+                        }
+                    });
+                }
+            })
+            closeBtn.onclick = () => {
+                modal.style.display = 'none';
+            };
+
+            function initGalleryState(region) {
+                if (!galleryStates.has(region)) {
+                    galleryStates.set(region, {
+                        offset: 0,
+                        hasMore: true,
+                        loading: false
+                    });
+                }
+            }
+
+            function createPopupContent(region, state) {
+                const container = document.createElement('div');
+                container.innerHTML = `
+                    <h3 style="margin: 0 0 15px 10px;">${region.toUpperCase()}</h3>
+                    <div class="image-gallery"></div>
+                    <div class="loading">Loading...</div>
+                `;
+                
+                const gallery = container.querySelector('.image-gallery');
+
+                gallery.onscroll = debounce(() => {
+                    const { scrollTop, scrollHeight, clientHeight } = gallery;
+                    if (scrollHeight - (scrollTop + clientHeight) < 200 && !state.loading) {
+                        loadImages(region, state, container);
+                    }
+                }, 200);
+                
+                return container;
+            }
+
+            async function locations() {
+                const response = await fetch(
+                    `/api/regions/`
+                );
+                const data = await response.json();
+                return data
+            }
+
+            async function loadImages(region, state, container) {
+                if (!state.hasMore || state.loading) return;
+                
+                state.loading = true;
+                container.querySelector('.loading').style.display = 'block';
+                
+                try {
+                    const response = await fetch(
+                        `/api/images/${region}?offset=${state.offset}`
+                    );
+                    const data = await response.json();
+                    
+                    const gallery = container.querySelector('.image-gallery');
+                    data.images.forEach(img => {
+                        const imgElement = document.createElement('img');
+                        imgElement.className = 'thumbnail';
+                        imgElement.src = `/thumbs/${region}/${img}`;
+                        imgElement.onclick = () => showImage(`/images/${region}/${img}`);
+                        gallery.appendChild(imgElement);
+                    });
+                    
+                    state.offset += data.images.length;
+                    state.hasMore = data.has_more;
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    state.loading = false;
+                    container.querySelector('.loading').style.display = 'none';
+                }
+            }
+
+            function showImage(src) {
+                const modal = document.querySelector('.modal');
+                const modalImg = document.querySelector('.modal-img');
+                const loading = document.querySelector('.loading-modal');
+
+                modalImg.style.opacity = '0';
+                loading.style.display = 'block';
+                modal.style.display = 'flex';
+
+                const newImg = new Image();
+                newImg.src = src;
+                
+                newImg.onload = () => {
+                    modalImg.src = src;
+                    loading.style.display = 'none';
+                    modalImg.style.opacity = '1';
+                };
+                
+                newImg.onerror = () => {
+                    loading.style.display = 'none';
+                    modal.style.display = 'none';
+                    console.error('Failed to load image:', src);
+                };
+            }
+
+        
+            window.onclick = (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            };
+
+            function debounce(fn, delay) {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => fn(...args), delay);
+                };
+            }
+            function showImpressum() {
+                document.getElementById('impressumModal').style.display = 'block';
+            }
+            function showPrivacy() {
+                document.getElementById('privacyModal').style.display = 'block';
+            }
+
+            function hideImpressum() {
+                document.getElementById('impressumModal').style.display = 'none';
+            }
+            function hidePrivacy() {
+                document.getElementById('privacyModal').style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('impressumModal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        </script>
+    </body>
+    </html>
+
+
+}
