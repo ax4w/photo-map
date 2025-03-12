@@ -22,7 +22,7 @@
     
     COPY --from=build /app/server /app/
     
-    COPY --from=build /app/index.html /app/
+    COPY --from=build /app/frontend/index.html /app/
     
     EXPOSE 8080
     
