@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -70,6 +71,9 @@ func logic() {
 			hash       = fmt.Sprintf("%x", sha256.Sum256([]byte(str)))
 			region, ok = getRegion(v.Name())
 		)
+		if n := strings.ReplaceAll(v.Name(), ".", ""); len(n) == 0 {
+			continue
+		}
 
 		if !ok {
 			println("found nothing for", v.Name())
