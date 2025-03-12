@@ -5,6 +5,8 @@ You can test it [here](https://travel.ax4w.me)
 
 > You are free to fork the project and change / adjust anything to your needs :^) 
 
+> Note: If the container is stopped **while** generating thumbnails, then you need to manually start `generate.sh`
+
 ## Setup
 1. Pull the docker image
 2. Mount a volume onto `/app/map-data` (**inside that folder the folder structure and scripts will be stored where you need to store your images**)

@@ -158,7 +158,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <script>
         const API_BASE = 'https://travel.ax4w.me';
-        const PAGE_SIZE = 30;
 
         const galleryStates = new Map();
         const modal = document.querySelector('.modal');
@@ -255,7 +254,7 @@
             
             try {
                 const response = await fetch(
-                    `${API_BASE}/api/images/${region}?offset=${state.offset}&limit=${PAGE_SIZE}`
+                    `${API_BASE}/api/images/${region}?offset=${state.offset}`
                 );
                 const data = await response.json();
                 

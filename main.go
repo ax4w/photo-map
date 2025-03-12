@@ -13,10 +13,10 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/api/images/", backend.Images)
-	http.HandleFunc("/api/regions/", backend.Regions)
-	http.HandleFunc("/images/", backend.Image)
-	http.HandleFunc("/thumbs/", backend.Thumbnail)
+	http.HandleFunc("/api/images/", backend.Cors(backend.Images))
+	http.HandleFunc("/api/regions/", backend.Cors(backend.Regions))
+	http.HandleFunc("/images/", backend.Cors(backend.Image))
+	http.HandleFunc("/thumbs/", backend.Cors(backend.Thumbnail))
 	http.HandleFunc("/", backend.Website)
 
 	fmt.Println("Server running on :8080")

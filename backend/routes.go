@@ -9,6 +9,22 @@ import (
 	"strings"
 )
 
+func Cors(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			http.Error(w, "No Content", http.StatusNoContent)
+			return
+		}
+
+		next(w, r)
+	}
+
+}
+
 func serveFile(w http.ResponseWriter, r *http.Request, folder string, pathParts []string) {
 	if len(pathParts) < 2 {
 		http.Error(w, "Invalid path", http.StatusBadRequest)
@@ -29,14 +45,6 @@ func Regions(w http.ResponseWriter, r *http.Request) {
 		regionsM = make(map[string]latlong)
 		regions  []Region
 	)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
 	if tx := pgConn.Find(&regions); tx.Error != nil {
 		println("error", tx.Error.Error())
@@ -50,15 +58,9 @@ func Regions(w http.ResponseWriter, r *http.Request) {
 }
 
 func Images(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
+	var (
+		limit = 30
+	)
 	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/images/"), "/")
 	if len(pathParts) < 1 {
 		http.Error(w, "Missing region", http.StatusBadRequest)
@@ -72,10 +74,6 @@ func Images(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	if limit <= 0 || limit > 30 {
-		limit = 30
-	}
 
 	imagePath := filepath.Join(imagesBasePath, region)
 	files, err := os.ReadDir(imagePath)
