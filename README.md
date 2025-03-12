@@ -3,6 +3,8 @@ Small project to display marker on the world map, which show a photo gallery of 
 
 You can test it [here](https://travel.ax4w.me)
 
+> You are free to fork the project and change / adjust anything to your needs :^) 
+
 ## Setup
 1. Pull the docker image
 2. Mount a volume onto `/app/map-data` (**inside that folder the folder structure and scripts will be stored where you need to store your images**)
@@ -16,6 +18,7 @@ You will need to set the following environment variables, which are used to conn
 - `port` : port of the database server
 - `user` : username to log into the database server
 - `password` : password to log into the database server
+
   
 ## Adding Locations
 Folders and scripts are automatically created when starting the container.
