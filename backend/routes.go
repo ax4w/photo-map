@@ -125,5 +125,5 @@ func Image(w http.ResponseWriter, r *http.Request) {
 }
 
 func Website(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./frontend/index.html")
+	http.ServeFile(w, r, "./index.html")
 }
