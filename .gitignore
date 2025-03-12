@@ -1,4 +1,4 @@
 images/
 asd
-./frontend/index.html
-./frontend/index_templ.go
+/frontend/index.html
+/frontend/index_templ.go
