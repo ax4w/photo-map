@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -14,7 +15,7 @@ type latlong struct {
 
 func latLongByName(name string) (latlong, bool) {
 	var (
-		resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=1", name))
+		resp, err = http.Get(fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=1", url.QueryEscape(name)))
 		jsonData  []map[string]any
 	)
 	if err != nil {
@@ -31,6 +32,7 @@ func latLongByName(name string) (latlong, bool) {
 		return latlong{}, false
 	}
 	if len(jsonData) == 0 {
+		println("did not find anything for", name)
 		return latlong{}, false
 	}
 	var (
