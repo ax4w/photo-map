@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/a-h/templ"
 	"log"
 	"net/http"
 	"os"
 	"photo-map/backend"
 	"photo-map/frontend"
-
-	"github.com/a-h/templ"
 )
 
 func init() {
