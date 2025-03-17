@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"pics/backend"
-	"pics/frontend"
+	"photo-map/backend"
+	"photo-map/frontend"
 
 	"github.com/a-h/templ"
 )

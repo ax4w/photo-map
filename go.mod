@@ -1,4 +1,4 @@
-module pics
+module photo-map
 
 go 1.24.0
 
