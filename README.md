@@ -3,7 +3,7 @@ Small project to display marker on the world map, which show a photo gallery of 
 
 You can test it [here](https://travel.ax4w.me)
 
-> You are free to fork the project and change / adjust anything to your needs :^) 
+> You are free to fork the project and change / adjust anything to your needs :^)
 
 > Note: If the container is stopped **while** generating thumbnails, then you need to manually start `generate.sh`
 
@@ -11,8 +11,9 @@ You can test it [here](https://travel.ax4w.me)
 1. Pull the docker image
 2. Mount a volume onto `/app/map-data` (**inside that folder the folder structure and scripts will be stored where you need to store your images**)
 3. Configure the enviroment variables listed under **environment**
-4. Start the Container
-   
+4. Install `imagemagick` and support for your image file types (jpeg,png,...)
+5. Start the Container
+
 ### Environment
 You will need to set the following environment variables, which are used to connect to your postgres database
 - `dbname` : the name of the database
@@ -21,7 +22,7 @@ You will need to set the following environment variables, which are used to conn
 - `user` : username to log into the database server
 - `password` : password to log into the database server
 - `title` : the title of the website
-  
+
 ## Adding Locations
 Folders and scripts are automatically created when starting the container.
 
@@ -40,12 +41,12 @@ Simply create a folder inside the `images` folder, which is inside the mounted v
 ```
 ---
 
-Inside that folder you can place the photos you want to display at that marker. 
+Inside that folder you can place the photos you want to display at that marker.
 
 After max. 3 Minutes a new entry should be visible on the map. If the marker is at the wrong location you will need to adjust `lat` and `long` manually in the database.
 The `lat` and `long` are fetched from [nominatim](https://nominatim.openstreetmap.org/) and could be wrong if there are multiple locations with same name.
 
-The gallery might look broken, because each time images change the thumbnails are being rebuild. If you have many images stored the rebuilding might take longer and the 
+The gallery might look broken, because each time images change the thumbnails are being rebuild. If you have many images stored the rebuilding might take longer and the
 thumbnails might not be generated yet. So just wait a bit :-) (You can see in the logs, if generation has been started / is finished)
 
 ## Perfomance
