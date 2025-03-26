@@ -16,7 +16,7 @@ body {
 .image-gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
+    gap: 8px;
     max-height: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -28,11 +28,13 @@ body {
 
 .thumbnail {
     width: 100%;
-    height: 150px;
+    height: 120px;
     object-fit: cover;
     cursor: pointer;
     border-radius: 8px;
     transition: transform 0.2s;
+    min-width: 120px;
+    aspect-ratio: 1/1;
 }
 
 .thumbnail:hover {
@@ -42,6 +44,7 @@ body {
 .leaflet-popup-content-wrapper {
     max-width: 100% !important;
     width: auto !important;
+    min-width: 400px !important;
     border-radius: 12px !important;
 }
 
@@ -50,6 +53,7 @@ body {
     margin: 13px 19px;
     line-height: 1.4;
     overflow-x: hidden;
+    width: auto !important;
 }
 
 .loading {
