@@ -15,7 +15,7 @@ body {
 
 .image-gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
     max-height: 30vh;
     overflow-y: auto;
