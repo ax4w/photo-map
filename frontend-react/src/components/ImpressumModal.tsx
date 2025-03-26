@@ -20,8 +20,7 @@ const ImpressumModal: React.FC<ImpressumModalProps> = ({ isOpen, onClose }) => {
             <span className="impressum-close" onClick={onClose}>&times;</span>
             <h2>Impressum</h2>
             <p>This is a photo map application that displays images based on geographical locations.</p>
-            <p>Created as a demo project for visualizing photos on a map.</p>
-            <p>© 2023 - All rights reserved</p>
+            <p>© 2025 - All rights reserved</p>
         </div>
     );
 };
