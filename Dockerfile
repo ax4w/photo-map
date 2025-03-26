@@ -1,32 +1,38 @@
+FROM node:18-alpine AS frontend-build
 
-    FROM golang:1.24-alpine AS build
+WORKDIR /app/frontend-react
+COPY frontend-react/package.json frontend-react/package-lock.json* ./
+RUN npm install
+COPY frontend-react/ ./
+RUN npm run build
 
-    WORKDIR /app
-    
-    COPY go.mod go.sum ./
-    RUN go mod download
-    RUN go install github.com/a-h/templ/cmd/templ@latest
+FROM golang:1.24-alpine AS backend-build
 
-    COPY . .
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
 
-    RUN templ generate
-    RUN go build -o server .
+COPY . .
+COPY --from=frontend-build /app/frontend-react/dist /app/frontend-react/dist
 
-    FROM alpine:latest
+RUN go build -o server .
 
-    RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+FROM alpine:latest
 
-    RUN apk add --no-cache file
-    RUN apk --update add imagemagick
-    RUN apk add --no-cache imagemagick imagemagick-libs libjpeg-turbo
-    
-    WORKDIR /app
-    
-    COPY --from=build /app/server /app/
-    
-    EXPOSE 8080
-    
-    USER appuser
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-    CMD ["./server"]
+RUN apk add --no-cache file
+RUN apk --update add imagemagick
+RUN apk add --no-cache imagemagick imagemagick-libs libjpeg-turbo
+
+WORKDIR /app
+
+COPY --from=backend-build /app/server /app/
+COPY --from=frontend-build /app/frontend-react/dist /app/frontend-react/dist
+
+EXPOSE 8080
+
+USER appuser
+
+CMD ["./server"]
     
