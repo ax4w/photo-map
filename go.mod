@@ -3,7 +3,6 @@ module photo-map
 go 1.24.0
 
 require (
-	github.com/a-h/templ v0.3.833
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
 )
