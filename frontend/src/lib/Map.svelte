@@ -34,7 +34,13 @@
                         html: '📍', 
                         iconSize: [30, 30],
                         iconAnchor: [15, 30]
-                    }} />
+                    }}>
+                        <Popup options={{
+                            maxWidth: 800
+                        }}>
+                            <h1>location.region</h1>
+                        </Popup>
+                </DivIcon>
                 </Marker>
             {/each}
         {/await}    
@@ -42,23 +48,22 @@
 </div>
 
 <style>
-#body {
-    background-color: #262626;
-    margin: 0;
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-}
+    #body {
+        background-color: #262626;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+            sans-serif;
+    }
 
-:global(.emoji-pin) {
-    font-size: 24px; 
-    line-height: 30px;
-} 
-
+    :global(.emoji-pin) {
+        font-size: 24px; 
+        line-height: 30px;
+    } 
 </style>
