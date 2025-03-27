@@ -70,3 +70,46 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .image-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 30vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 780px;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s;
+    min-width: 120px;
+    aspect-ratio: 1/1;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+
+.loading {
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    border-radius: 20px;
+}
+</style>

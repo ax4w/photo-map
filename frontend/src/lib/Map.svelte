@@ -66,4 +66,20 @@
         font-size: 24px; 
         line-height: 30px;
     } 
+
+
+    :global(.leaflet-popup-content-wrapper) {
+        max-width: 100% !important;
+        width: auto !important;
+        min-width: 400px !important;
+        border-radius: 12px !important;
+    }
+
+    :global(.leaflet-popup-content) {
+        overflow: auto;
+        margin: 13px 19px;
+        line-height: 1.4;
+        overflow-x: hidden;
+        width: auto !important;
+    }
 </style>
