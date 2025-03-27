@@ -34,13 +34,13 @@
                         html: '📍', 
                         iconSize: [30, 30],
                         iconAnchor: [15, 30]
+                    }} />
+                    <Popup options={{
+                        maxWidth: 800
                     }}>
-                        <Popup options={{
-                            maxWidth: 800
-                        }}>
-                            <h1>location.region</h1>
-                        </Popup>
-                </DivIcon>
+                        <h1>{location.region}</h1>
+                    </Popup>
+                    
                 </Marker>
             {/each}
         {/await}    
