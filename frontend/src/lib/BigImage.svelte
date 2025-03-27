@@ -79,12 +79,28 @@
 
     .close {
         position: absolute;
-        top: 25px;
-        right: 35px;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.8);
         color: white;
-        font-size: 45px;
+        font-size: 28px;
         cursor: pointer;
-        text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.2s ease;
+        outline: none;
+        padding: 0;
+        line-height: 40px;
+    }
+
+    .close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
     }
 </style>
     
