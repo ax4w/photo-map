@@ -1,7 +1,9 @@
-<script>
+<script lang="ts">
 	import { Map, TileLayer, Marker, Popup, DivIcon } from 'sveaflet';
     import { fetchLocations } from '../api';
-  import Gallery from './Gallery.svelte';
+    import Gallery from './Gallery.svelte';
+
+    let { onSelectImage } = $props();
     
     let locationsPromise = $state(fetchLocations());
 </script>
@@ -39,7 +41,7 @@
                     <Popup options={{
                         maxWidth: 800
                     }}>
-                        <Gallery region={location.region} />
+                        <Gallery region={location.region} {onSelectImage} />
                     </Popup>
                     
                 </Marker>

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { fetchImages, getThumbUrl } from "../api";
+    import { fetchImages, getThumbUrl, getImageUrl } from "../api";
 
-    let { region } = $props();
+    let { region, onSelectImage } = $props();
     
     let galleryElement: HTMLDivElement;
 
@@ -19,8 +19,12 @@
 
         try {
             const data = await fetchImages(region, galleryState.offset);
-            galleryState.images = [...galleryState.images, ...data.images];
-            galleryState.offset += data.images.length;
+            if (data.images) {
+                galleryState.images = [...galleryState.images, ...data.images];
+                galleryState.offset += data.images.length;
+            } else {
+                console.error('Received null images in response', data);
+            }
             galleryState.hasMore = data.has_more;
             galleryState.loading = false;
         } catch (error) {
@@ -36,11 +40,6 @@
         if (scrollHeight - (scrollTop + clientHeight) < 200 && !galleryState.loading && galleryState.hasMore) {
             loadImages();
         }
-    }
-
-    function handleImageClick(img: string) {
-        // TODO: Implement image selection logic
-        console.log('Image clicked:', img);
     }
 
     $effect(() => {
@@ -61,7 +60,7 @@
                 class="thumbnail"
                 src={getThumbUrl(region, img)}
                 alt={`Thumbnail ${index}`}
-                onclick={() => handleImageClick(img)}
+                onclick={() => onSelectImage(getImageUrl(region, img))}
             />
         {/each}
         
