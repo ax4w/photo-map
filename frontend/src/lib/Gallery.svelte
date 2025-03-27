@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fetchImages } from "../api";
+    import { fetchImages, getThumbUrl } from "../api";
 
     let { region } = $props();
     
@@ -59,7 +59,7 @@
         {#each galleryState.images as img, index}
             <img
                 class="thumbnail"
-                src={`/api/thumbnails/${region}/${img}`}
+                src={getThumbUrl(region, img)}
                 alt={`Thumbnail ${index}`}
                 onclick={() => handleImageClick(img)}
             />
