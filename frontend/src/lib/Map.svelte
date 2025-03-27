@@ -56,4 +56,9 @@
         sans-serif;
 }
 
+.emoji-pin {
+    font-size: 24px; 
+    line-height: 30px;
+} 
+
 </style>
