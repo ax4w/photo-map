@@ -3,7 +3,10 @@ FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
-COPY frontend/ ./
+COPY frontend/src ./src
+COPY frontend/public ./public
+COPY frontend/index.html ./
+COPY frontend/tsconfig.json frontend/tsconfig.app.json frontend/tsconfig.node.json frontend/svelte.config.js frontend/vite.config.ts ./
 RUN npm run build
 
 FROM golang:1.24-alpine AS backend-build
