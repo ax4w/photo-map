@@ -83,23 +83,22 @@
         right: 20px;
         width: 40px;
         height: 40px;
-        background: rgba(0, 0, 0, 0.5);
-        border: 2px solid rgba(255, 255, 255, 0.8);
+        background: transparent;
+        border: none;
         color: white;
-        font-size: 28px;
+        font-size: 32px;
         cursor: pointer;
-        border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
         transition: all 0.2s ease;
         outline: none;
         padding: 0;
-        line-height: 40px;
+        text-align: center;
+        line-height: 1;
     }
 
     .close:hover {
-        background: rgba(255, 255, 255, 0.2);
         transform: scale(1.1);
     }
 </style>
