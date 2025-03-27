@@ -25,17 +25,16 @@
 </script>
 
 <div>
-    {#if loading}
+    {#if isOpen && loading}
         <div class="loading-modal">Loading...</div>
     {/if}
-    {#if imageLoaded}
+    {#if isOpen && imageLoaded}
         <div class="modal">
             <button class="close" onclick={onClose}>&times;</button>
             <img 
                 class="modal-img" 
                 src={imageUrl} 
                 alt="Enlarged view" 
-                onload={() => imageLoaded = true}
             />
         </div>
     {/if}
@@ -43,7 +42,7 @@
 
 <style>
     .modal {
-        display: none;
+        display: flex;
         position: fixed;
         top: 0;
         left: 0;
@@ -63,11 +62,19 @@
     }
 
     .loading-modal {
-        display: none;
-        position: absolute;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
         color: white;
         font-size: 1.5em;
         text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
     }
 
     .close {
