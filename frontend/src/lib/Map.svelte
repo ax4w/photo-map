@@ -2,13 +2,7 @@
 	import { Map, TileLayer, Marker, Popup, DivIcon } from 'sveaflet';
     import { fetchLocations } from '../api';
     
-    let locationsPromise = $state(fetchLocations().then(locationsObj => {
-        return Object.entries(locationsObj).map(([region, location]) => ({
-            region,
-            lat: location.Lat,
-            lng: location.Long
-        }));
-    }));
+    let locationsPromise = $state(fetchLocations());
 </script>
 
 <div id="body">
@@ -29,7 +23,11 @@
         {#await locationsPromise}
             <div>Loading...</div>
         {:then locations}
-            {#each locations as location}
+            {#each Object.entries(locations).map(([region, location]) => ({
+                region,
+                lat: location.Lat,
+                lng: location.Long
+            })) as location}
                 <Marker latLng={[location.lat, location.lng]}>
                     <DivIcon options={{
                         className: 'emoji-pin',
