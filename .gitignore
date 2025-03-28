@@ -1,6 +1,5 @@
 images/
 asd
-/frontend/index.html
 /frontend/index_templ.go
 .idea/
 /frontend-react/node_modules/

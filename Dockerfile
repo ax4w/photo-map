@@ -1,9 +1,12 @@
-FROM node:18-alpine AS frontend-build
+FROM node:20-alpine AS frontend-build
 
-WORKDIR /app/frontend-react
-COPY frontend-react/package.json frontend-react/package-lock.json* ./
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
-COPY frontend-react/ ./
+COPY frontend/src ./src
+COPY frontend/public ./public
+COPY frontend/index.html ./
+COPY frontend/tsconfig.json frontend/tsconfig.app.json frontend/tsconfig.node.json frontend/svelte.config.js frontend/vite.config.ts ./
 RUN npm run build
 
 FROM golang:1.24-alpine AS backend-build
@@ -13,7 +16,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-COPY --from=frontend-build /app/frontend-react/dist /app/frontend-react/dist
+COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
 RUN go build -o server .
 
@@ -28,7 +31,7 @@ RUN apk add --no-cache imagemagick imagemagick-libs libjpeg-turbo
 WORKDIR /app
 
 COPY --from=backend-build /app/server /app/
-COPY --from=frontend-build /app/frontend-react/dist /app/frontend-react/dist
+COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
 EXPOSE 8080
 

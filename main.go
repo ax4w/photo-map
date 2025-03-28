@@ -21,10 +21,10 @@ func main() {
 	http.HandleFunc("/images/", backend.Cors(backend.Image))
 	http.HandleFunc("/thumbs/", backend.Cors(backend.Thumbnail))
 
-	fs := http.FileServer(http.Dir(filepath.Join("frontend-react", "dist")))
+	fs := http.FileServer(http.Dir(filepath.Join("frontend", "dist")))
 	http.Handle("/", backend.Cors(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" && !fileExists(filepath.Join("frontend-react", "dist", r.URL.Path)) {
-			http.ServeFile(w, r, filepath.Join("frontend-react", "dist", "index.html"))
+		if r.URL.Path != "/" && !fileExists(filepath.Join("frontend", "dist", r.URL.Path)) {
+			http.ServeFile(w, r, filepath.Join("frontend", "dist", "index.html"))
 			return
 		}
 		fs.ServeHTTP(w, r)
