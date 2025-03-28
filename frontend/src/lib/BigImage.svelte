@@ -5,6 +5,7 @@
     let imageLoaded = $state(false);
     
     $effect(() => {
+        // run everytime when isOpen or imageUrl changes
         if (isOpen && imageUrl) {
             loading = true;
             imageLoaded = false;
