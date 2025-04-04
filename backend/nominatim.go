@@ -3,7 +3,6 @@ package backend
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -22,15 +21,7 @@ func latLongByName(name string) (latlong, bool) {
 		println("error in get", err.Error())
 		return latlong{}, false
 	}
-	bodyInBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		println("error reading response", err.Error())
-		return latlong{}, false
-	}
-	if err := json.Unmarshal(bodyInBytes, &jsonData); err != nil {
-		println(err.Error())
-		return latlong{}, false
-	}
+	json.NewDecoder(resp.Body).Decode(&jsonData)
 	if len(jsonData) == 0 {
 		println("did not find anything for", name)
 		return latlong{}, false
